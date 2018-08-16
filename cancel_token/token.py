@@ -51,6 +51,10 @@ class CancelToken:
         """
         self._triggered.set()
 
+    def reset(self) -> None:
+        """Reset this cancel token by clearing its triggered event."""
+        self._triggered.clear()
+
     @property
     def triggered_token(self) -> 'CancelToken':
         """

@@ -16,6 +16,8 @@ def test_token_single():
     token.trigger()
     assert token.triggered
     assert token.triggered_token == token
+    token.reset()
+    assert not token.triggered
 
 
 def test_token_chain_event_loop_mismatch():
