@@ -17,3 +17,10 @@ class OperationCancelled(BaseCancelTokenException):
     Raised when an operation was cancelled.
     """
     pass
+
+
+class InvalidTokenTriggerer(BaseCancelTokenException):
+    """
+    Raised when a token is triggered by a method not belonging to its owner.
+    """
+    pass

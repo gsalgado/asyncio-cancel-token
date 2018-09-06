@@ -10,6 +10,7 @@ from typing import (  # noqa: F401
 
 from .exceptions import (
     EventLoopMismatch,
+    InvalidTokenTriggerer,
     OperationCancelled,
 )
 
@@ -17,7 +18,8 @@ _R = TypeVar('_R')
 
 
 class CancelToken:
-    def __init__(self, name: str, loop: asyncio.AbstractEventLoop = None) -> None:
+    def __init__(self, owner: Any, name: str, loop: asyncio.AbstractEventLoop = None) -> None:
+        self._owner = owner
         self.name = name
         self._chain: List['CancelToken'] = []
         self._triggered = asyncio.Event(loop=loop)
@@ -49,6 +51,13 @@ class CancelToken:
         """
         Trigger this cancel token and any child tokens that have been chained with it.
         """
+        import inspect
+        caller = inspect.stack()[1]
+        caller_self = caller.frame.f_locals.get('self')
+        if caller_self != self._owner:
+            raise InvalidTokenTriggerer(
+                "Non-owner ({}) attempted to trigger {}. Actual owner is {}".format(
+                    caller_self, self, self._owner))
         self._triggered.set()
 
     @property

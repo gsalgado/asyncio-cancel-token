@@ -8,14 +8,27 @@ from cancel_token import (
     EventLoopMismatch,
     OperationCancelled,
 )
+from cancel_token.exceptions import InvalidTokenTriggerer
+
+
+class TokenOwner:
+
+    def __init__(self):
+        self.token = CancelToken(self, 'token')
+
+    def trigger_token(self):
+        self.token.trigger()
 
 
 def test_token_single():
-    token = CancelToken('token')
-    assert not token.triggered
-    token.trigger()
-    assert token.triggered
-    assert token.triggered_token == token
+    owner = TokenOwner()
+    assert not owner.token.triggered
+    owner.trigger_token()
+    assert owner.token.triggered
+    assert owner.token.triggered_token == owner.token
+
+    with pytest.raises(InvalidTokenTriggerer):
+        owner.token.trigger()
 
 
 def test_token_chain_event_loop_mismatch():
